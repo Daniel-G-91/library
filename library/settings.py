@@ -81,9 +81,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'library_db',  # Replace with your actual database name
-        'USER': 'sqlserver',  # Leave empty for Windows Authentication
-        'PASSWORD': 'daniel123',  # Leave empty for Windows Authentication
-        'HOST': '34.22.184.124',  # Your server name from the SSMS window
+        'USER': '#',  # Leave empty for Windows Authentication
+        'PASSWORD': '#',  # Leave empty for Windows Authentication
+        'HOST': '#',  # Your server name from the SSMS window
         'PORT': '1433',  # Leave empty for default port (1433)
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
