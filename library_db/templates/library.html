@@ -1,0 +1,276 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraryDB</title>
+    <link rel="stylesheet" href="{% static '/library.css' %}">
+</head>
+<body>
+    <!-- Landing page -->
+
+    <div class="landing-page">
+        <div class="container">
+
+            <!-- Log in -->
+            <div class="login-form" id="login-form">
+                <h2>Login</h2>
+                <form method="POST" id="login-form">
+                    {% csrf_token %}
+                    <label for="username">Username</label>
+                    <input type="text" id="login-username" name="username">
+                    <span id="login-username-error"></span> <!-- Error element for username -->
+                    
+                    <label for="password">Password</label>
+                    <input type="password" id="login-password" name="password">
+                    <span id="login-password-error"></span> <!-- Error element for password -->
+                    
+                    <a href="#" id="forgot-password">Forgot Password?</a>
+                    <div class="buttons">
+                        <button id="login-btn">Log In</button>
+                        <button id="signin-btn">Sign In</button>
+                    </div>
+                </form>
+            </div>
+            
+            
+            <!-- Sign up -->
+
+            <div class="signup-form" id="signup-form" style="display: none;">
+                <h2>Sign Up</h2>
+                <form method="POST" id="signup-form">
+                    {% csrf_token %}
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <span id="email-error"></span>
+                    
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="new-username" required>
+                    <span id="username-error"></span>
+                    
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="new-password" required>
+                    <span id="password-error"></span>
+                    
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                    <span id="confirm-password-error"></span>
+                
+                </form>
+
+                <div class="buttons">
+                    <button id="signup-btn">Sign Up</button>
+                    <button id="abort-btn">Abort</button>
+                </div>
+
+                <p id="success-message"></p> 
+            </div>
+    </div>
+
+    <!-- Library page -->
+    
+    <div class="library-page">
+
+    </div>
+    
+    <!-- User page -->
+    
+    <div class="user-page">
+
+    </div>
+
+    <!-- Landing page switch between sign in / up -->
+    <script>
+        document.getElementById('signin-btn').addEventListener('click', function() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'block';
+            clearErrors('login');
+            document.getElementById('email-error').innerText = "";
+            document.getElementById('username-error').innerText = "";
+            document.getElementById('password-error').innerText = "";
+            document.getElementById('confirm-password-error').innerText = "";
+
+        });
+
+        document.getElementById('abort-btn').addEventListener('click', function() {
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+            clearErrors('signup');
+            document.getElementById('login-username-error').innerText = "";
+            document.getElementById('login-password-error').innerText = "";
+        });
+
+        function clearErrors(formType) {
+           let errorElements = document.querySelectorAll(`#${formType}-form .error-message`);
+            errorElements.forEach(error => {
+             error.innerText = "";
+            });
+        }
+    </script>
+
+    <!-- Sign up -->
+     <script>
+        document.getElementById('signup-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            var email = document.getElementById('email').value;
+            var username = document.getElementById('new-username').value;
+            var password1 = document.getElementById('new-password').value;
+            var password2 = document.getElementById('confirm-password').value;
+
+            var emailError = document.getElementById('email-error');
+            var usernameError = document.getElementById('username-error');
+            var passwordError = document.getElementById('password-error');
+            var confirmPasswordError = document.getElementById('confirm-password-error');
+
+
+              // Clear previous errors
+            emailError.innerText = "";
+            usernameError.innerText = "";
+            passwordError.innerText = "";
+            confirmPasswordError.innerText = "";
+
+            let valid = true;
+
+            // Validation rules
+            if (username.length < 3) {
+                usernameError.innerText = "Username must be at least 3 characters long.";
+                usernameError.style.color = "red";
+                valid = false;
+            }
+
+            if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)) {
+                emailError.innerText = "Invalid email format.";
+                emailError.style.color = "red";
+                valid = false;
+            }
+
+            if (password1.length < 5) {
+                passwordError.innerText = "Password must be at least 5 characters long.";
+                passwordError.style.color = "red";
+                valid = false;
+            }
+
+            if (password1 !== password2) {
+                confirmPasswordError.innerText = "Passwords do not match.";
+                confirmPasswordError.style.color = "red";
+                valid = false;
+            }
+
+            if (!valid) return; // Stop execution if validation fails
+
+
+            var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+            fetch('/signup/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({
+                    email: email,
+                    username: username,
+                    password1: password1,
+                    password2: password2,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var successMessage = document.getElementById('success-message');
+                    successMessage.innerText = "User created successfully! Redirecting to login...";
+                    successMessage.style.color = "green";
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
+                } else {
+                    data.errors.forEach(error => {
+                        if (error.includes("Username must be at least 3 characters long.")) {
+                            usernameError.innerText = error;
+                            usernameError.style.color = "red";
+                        }
+                        if (error.includes("Username is already registered.")) {
+                            usernameError.innerText = error;
+                            usernameError.style.color = "red";
+                        }
+                        if (error.includes("Invalid email format.")) {
+                            emailError.innerText = error;
+                            emailError.style.color = "red";
+                        }
+                        if (error.includes("Password must be at least 5 characters long.")) {
+                            passwordError.innerText = error;
+                            passwordError.style.color = "red";
+                        }
+                        if (error.includes("Email is already registered.")) {
+                            emailError.innerText = error;
+                            emailError.style.color = "red";
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Sign-up failed!', error);
+                alert('An error occurred while signing up.');
+            })
+
+        });
+
+     </script>
+
+     <!-- Log In -->
+
+     <script>
+     document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent default form submission
+    
+        let username = document.getElementById('login-username').value.trim();
+        let password = document.getElementById('login-password').value.trim();
+        let usernameError = document.getElementById('login-username-error');
+        let passwordError = document.getElementById('login-password-error');
+    
+        // Reset previous errors
+        usernameError.innerText = "";
+        passwordError.innerText = "";
+    
+        var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+    
+        fetch('/login/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,  
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                data.errors.forEach(error => {
+                    if (error.includes("Username is required")) {
+                        usernameError.innerText = error;
+                        usernameError.style.color = "red";
+                    }
+                    if (error.includes("Password is required") || error.includes("Invalid username or password")) {
+                        passwordError.innerText = error;
+                        passwordError.style.color = "red";
+                    }
+                });
+            } else {
+                window.location.href = data.redirect_url;  // Redirect on success
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    });
+    </script>
+
+</body>
+</html>

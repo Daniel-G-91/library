@@ -1,0 +1,504 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library App</title>
+    <link rel="stylesheet" href="{% static '/app.css' %}">
+</head>
+<body>
+    <div class="container">
+
+        <!-- User Panel -->
+        <div class="user-panel">
+            <h2>Welcome, <span id="username">{{ username }}</span> 😊</h2>
+            
+            <div class="op-msg">
+                <p id="text-1">Your Shelf:</p>
+                <p id="auth-title"></p>
+                <p id="op-msg"></p>
+                <p id="return-date"></p>
+            </div>
+            
+            <div class="user-shelf">
+
+                <div class="book-actions">
+                    
+                    <button id="borrow-btn" disabled>Borrow</button>
+                        <form method="POST" id="borrow-form">
+                            {% csrf_token %}        
+                        </form>
+                    
+                    <button id="extend-btn" disabled>Extend</button>
+                        <form method="POST" id="extend-form">
+                            {% csrf_token %}        
+                        </form>
+                    
+                    <button id="return-btn" disabled>Return</button>
+                        <form method="POST" id="return-form">
+                            {% csrf_token %}        
+                        </form>
+            
+                </div>
+
+                <div class="shelf-books" id="user-books">
+                    {% for book in borrowed_books %}
+                        <img src="{% static 'images/'|add:book.book_img|add:'.jpg' %}" 
+                                class="book-item" 
+                                id="book-item" 
+                                data-id = "{{ book.book_id }}"
+                                data-author="{{ book.book_author }}" 
+                                data-title="{{ book.book_title }}" 
+                                data-borrow-date="{{ book.borrow_date }}" 
+                                data-return-date="{{ book.return_date }}">
+                    {% endfor %}
+                </div>
+
+                <div class="book-details" id="book-details">
+                    <!-- <p id="book_id"></p> -->
+                    <input type="hidden" id="book_id">
+                </div>
+            </div>
+            
+            <button id="logout-btn">Log Out</button>
+                <form method="POST" id="logout-form">
+                    {% csrf_token %}        
+                </form>
+        </div>
+
+        <!-- Library Panel -->
+        <div class="book-det">
+            <div class="search-bar">
+                <input type="text" id="search-bar" placeholder="Search for books...">
+            </div>
+            <div class="stock-details" id="stock-details">
+                <p id="stock_det"></p>
+                <input type="hidden" id="stock_id">
+            </div>
+        </div>
+
+        <div class="library-panel">
+            
+            <div class="book-list" id="library-books">
+                {% for book in stock %}
+                        <img src="{% static 'images/'|add:book.book_img|add:'.jpg' %}" 
+                                class="stock-item" 
+                                id="stock-item" 
+                                data-id = "{{ book.book_id }}"
+                                data-author="{{ book.book_author }}" 
+                                data-title="{{ book.book_title }}" 
+                                data-samples="{{ book.samples }}">
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- User pannel -->
+
+    <!-- Book selector (book-detail display | extend-btn & return-btn activation) -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bookItems = document.querySelectorAll('.book-item');
+            const bookDetails = document.getElementById('book-details');
+            const buttonE = document.getElementById('extend-btn');
+            const buttonR = document.getElementById('return-btn');
+            const buttonB = document.getElementById('borrow-btn');
+            const bookID = document.getElementById('book_id');    
+            const stockDetails = document.getElementById('stock-details');
+            const opMsg = document.getElementById('op-msg'); 
+            const retDate = document.getElementById('return-date');
+
+            document.getElementById('user-books').addEventListener('click', function(event) {
+                
+                const book = event.target.closest('.book-item'); // Ensure the clicked element is a book item
+                if (!book) return;
+
+                    const bookId = book.getAttribute('data-id');
+                    const author = book.getAttribute('data-author');
+                    const title = book.getAttribute('data-title');
+                    const returnDate = book.getAttribute('data-return-date');
+                    const authTitle = document.getElementById('auth-title');
+
+                    document.getElementById('book_id').value = `${bookId}`; // not displayed
+                    authTitle.textContent = `${author} - ${title}`; 
+                    authTitle.value = `${author} - ${title}`;
+                    document.getElementById('return-date').textContent = `[${formatDate(returnDate)}]`;
+
+                    bookDetails.style.display = 'block';
+                    //bookID.style.display = 'none';
+                    stockDetails.style.display = 'none';
+                    buttonE.disabled = false;
+                    buttonR.disabled = false;
+                    buttonB.disabled = true;
+                    opMsg.innerHTML = '';
+                    authTitle.style.display = 'block';
+                    opMsg.style.display = 'none';
+                    retDate.style.display = 'block';
+                    
+                });
+            });
+
+    </script>
+
+<!-- Stock selector (book-detail display | borrow-btn activation) -->
+     
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const stockItems = document.querySelectorAll('.stock-item');
+        const stockDetails = document.getElementById('stock-details');
+        const buttonB = document.getElementById('borrow-btn');
+        const stockID = document.getElementById('stock_id');    
+        const buttonE = document.getElementById('extend-btn');
+        const buttonR = document.getElementById('return-btn');
+        const bookDetails = document.getElementById('book-details');
+        const opMsg = document.getElementById('op-msg'); 
+        const authTitle = document.getElementById('auth-title');
+        const retDate = document.getElementById('return-date');
+
+        stockItems.forEach(book => {
+            book.addEventListener('click', function() {
+                const stockId = book.getAttribute('data-id');
+                const author = book.getAttribute('data-author');
+                const title = book.getAttribute('data-title');
+                const sample = book.getAttribute('data-samples');
+ 
+
+                document.getElementById('stock_id').value = `${stockId}`; // not displayed
+                document.getElementById('stock_det').textContent = `${author} - ${title} [${sample}]`;
+                
+                stockDetails.style.display = 'block';
+                bookDetails.style.display = 'none';
+                stockID.style.display = 'none';
+                buttonB.disabled = false;
+                buttonE.disabled = true;
+                buttonR.disabled = true;
+                opMsg.innerHTML = '';
+                authTitle.style.display = 'none';
+                retDate.style.display = 'none';
+                
+            });
+        });
+    });
+
+</script>
+
+
+<!-- Extend-btn -->
+
+    
+<script>
+    document.getElementById('extend-btn').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const bookID = document.getElementById('book_id').value;
+        const authTitle = document.getElementById('auth-title');
+        
+        
+        const bookItem = document.querySelector(`.book-item[data-id="${bookID}"]`); // Find the correct book
+        if (!bookItem) {
+            console.error("Book item not found");
+            return;
+        }
+        const csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        const opMsg = document.getElementById('op-msg'); 
+        const retDate = document.getElementById('return-date');
+
+
+        fetch('/extend/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                book_id: bookID
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                opMsg.textContent = data.message;  
+                opMsg.style.color = "green"; 
+                opMsg.style.display = "block";
+                if (data.new_return_date) {
+                    bookItem.setAttribute('data-return-date', data.new_return_date);
+                    authTitle.style.display = "none";
+                    retDate.style.display ="none";
+                }
+            } else {
+                opMsg.textContent = data.errors.join('\n'); 
+                opMsg.style.color = "red"; 
+                authTitle.style.display = "none";
+                opMsg.style.display = "block";
+                retDate.style.display ="none";
+            }
+        })
+        
+        .catch(error => {
+            console.error('Error:', error);
+            opMsg.textContent = "An error occurred while extending the book borrow period.";
+            opMsg.style.color = "red";
+            opMsg.style.display = "block";
+            retDate.style.display = "none";
+        });
+        });
+
+</script>
+
+<!-- Retrun-btn -->
+
+<script>
+    document.getElementById('return-btn').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const bookID = document.getElementById('book_id').value;
+        const csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        const opMsg = document.getElementById('op-msg'); 
+        const bookDetails = document.getElementById('book-details');
+        const authTitle = document.getElementById('auth-title');
+        const change = 1;
+        const retDate = document.getElementById('return-date');
+
+        fetch('/return/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                book_id: bookID
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateUserBooks(data.borrowed_books, data.book_id, change);
+                opMsg.textContent = data.message;  
+                opMsg.style.color = "green";
+                opMsg.style.display = "block"; 
+                bookDetails.style.display = "none";
+                authTitle.style.display = "none";
+                retDate.style.display = "none";
+
+            } else {
+                opMsg.textContent = data.errors.join('\n'); 
+                opMsg.style.color = "red";
+                opMsg.style.display = "block"; 
+                authTitle.style.display = "none";
+                retDate = "none";
+            }
+        })
+        
+        .catch(error => {
+            console.error('Error:', error);
+            opMsg.textContent = "An error occurred while returning the book.";
+            opMsg.style.color = "red";
+            opMsg.style.display = "block";
+            retDate.style.display = "none";
+        });
+        });
+
+</script>
+
+<!-- Borrow-btn -->
+
+<script>
+    document.getElementById('borrow-btn').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const bookID = document.getElementById('stock_id').value;
+        const csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        const opMsg = document.getElementById('op-msg'); 
+        const stockDet = document.getElementById('stock_det');
+        const change = -1;
+        const buttonB = document.getElementById('borrow-btn');
+        const authTitle = document.getElementById('auth-title');
+        const retDate = document.getElementById('return-date');
+
+        fetch('/borrow/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                book_id: bookID
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateUserBooks(data.borrowed_books, data.book_id, change);
+                opMsg.textContent = data.message;  
+                opMsg.style.color = "green";
+                opMsg.style.display = "block"; 
+                stockDet.innerHTML = "";
+                buttonB.disabled = true;
+                authTitle.style.display = "none";
+                retDate.style.display = "none";
+
+            } else {
+                opMsg.textContent = data.errors.join('\n'); 
+                opMsg.style.color = "red"; 
+                opMsg.style.display = "block";
+                authTitle.style.display = "none";
+                retDate.style.display ="none";
+            }
+        })
+        
+        .catch(error => {
+            console.error('Error:', error);
+            opMsg.textContent = "An error occurred while borrowing the book.";
+            opMsg.style.color = "red";
+            opMsg.style.display = "block";
+            authTitle.style.display = "none";
+            retDate.style.display ="none";
+        });
+        });
+
+</script>
+
+<!-- Helper fuctions -->
+
+<!-- Static path -->
+<script>
+    const staticBasePath = "{% static 'images/' %}";
+</script>
+
+<!-- Date format -->
+<script>
+    function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+</script>
+
+<!-- Return - img container display update -->
+<script>
+    function updateUserBooks(borrowedBooks, bookId, change) {
+    const userBooksContainer = document.getElementById("user-books");
+
+    // Clear the existing books
+    userBooksContainer.innerHTML = "";
+    updateStockSamples(bookId, change);
+    // Add updated books
+    borrowedBooks.forEach(book => {
+        const bookElement = document.createElement("img");
+        bookElement.src = `${staticBasePath}${book.book_img}.jpg`; // Update the book image path
+        bookElement.className = "book-item";
+        bookElement.id = "book-item";
+        bookElement.setAttribute("data-id", book.book_id);
+        bookElement.setAttribute("data-author", book.book_author);
+        bookElement.setAttribute("data-title", book.book_title);
+        bookElement.setAttribute("data-borrow-date", book.borrow_date);
+        bookElement.setAttribute("data-return-date", book.return_date);
+
+        // Append the new book element
+        userBooksContainer.appendChild(bookElement);
+      
+    });
+
+    }
+</script>
+
+<!-- Update stock -->
+
+<script>
+    function updateStockSamples(bookId, change) {
+
+    const stockBooks = document.querySelectorAll(".stock-item");
+    let bookFound = false;
+
+    stockBooks.forEach(book => {
+        if (book.getAttribute("data-id") === bookId.toString()) {
+            bookFound = true;
+            let currentSamples = parseInt(book.getAttribute("data-samples"), 10);
+
+            if (!isNaN(currentSamples)) {
+                let newSamples = currentSamples + change;
+                newSamples = Math.max(newSamples, 0); // Prevent negative stock
+                
+                book.setAttribute("data-samples", newSamples);
+            }
+        }
+    });
+
+    if (!bookFound) {
+        console.error(`Book with ID ${bookId} not found in stock!`);
+    }
+}
+
+</script>
+
+<!-- Search bar -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchBar = document.getElementById("search-bar");
+    const books = document.querySelectorAll(".stock-item");
+    const stockDetails = document.getElementById('stock-details');
+
+    searchBar.addEventListener("input", function () {
+        const query = searchBar.value.toLowerCase().trim();
+        stockDetails.style.display = "none";
+
+        books.forEach(book => {
+            const title = book.getAttribute("data-title").toLowerCase();
+            const author = book.getAttribute("data-author").toLowerCase();
+
+            if (title.includes(query) || author.includes(query)) {
+                book.style.display = "block"; // Show matching books
+            } else {
+                book.style.display = "none"; // Hide non-matching books
+            }
+        });
+    });
+});
+
+</script>
+
+<!-- Log out -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutBtn = document.getElementById("logout-btn");
+    const csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+    const opMsg = document.getElementById('op-msg'); 
+    const authTitle = document.getElementById('auth-title');
+    const retDate = document.getElementById('return-date');
+
+    logoutBtn.addEventListener("click", function () {
+
+        fetch("/logout/", {  
+            method: "POST",
+            headers: { "X-CSRFToken": csrftoken }, 
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                retDate.style.display = "none";
+                authTitle.style.display = "none";
+                opMsg.style.display = "block";
+                opMsg.innerHTML = '';
+                opMsg.textContent = data.message;  
+                opMsg.style.color = "green"; 
+                
+                setTimeout(() => {
+                    window.location.href = "/";  
+                }, 3000);  
+            }
+        })
+        .catch(error => console.error("Logout failed:", error));
+    });
+
+    setTimeout(() => opMsg.innerText='', 2700); 
+});
+</script>
+
+
+</body>
+</html>
