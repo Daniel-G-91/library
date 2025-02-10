@@ -24,9 +24,9 @@ urlpatterns = [
     path('library/signup/', sign_up, name="sign-up"),
     path('library/login/', log_in, name="login"),
     path('library/app/', library_view, name='library'),
-    path('library/borrow/', borrow_book, name="borrow"),
-    path('library/extend/', extend_book, name="extend"),
-    path('library/return/', return_book, name="return"),
-    path('library/logout/', log_out, name="logout")
+    path('library/app/borrow/', borrow_book, name="borrow"),
+    path('library/app/extend/', extend_book, name="extend"),
+    path('library/app/return/', return_book, name="return"),
+    path('library/app/logout/', log_out, name="logout")
 
 ]
