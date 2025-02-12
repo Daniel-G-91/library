@@ -208,7 +208,7 @@
         const retDate = document.getElementById('return-date');
 
 
-        fetch('/extend/', {
+        fetch('/library/app/extend/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,8 +262,9 @@
         const authTitle = document.getElementById('auth-title');
         const change = 1;
         const retDate = document.getElementById('return-date');
+        const buttonR = document.getElementById('return-btn');
 
-        fetch('/return/', {
+        fetch('/library/app/return/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -283,6 +284,7 @@
                 bookDetails.style.display = "none";
                 authTitle.style.display = "none";
                 retDate.style.display = "none";
+                buttonR.disabled = true;
 
             } else {
                 opMsg.textContent = data.errors.join('\n'); 
@@ -319,7 +321,7 @@
         const authTitle = document.getElementById('auth-title');
         const retDate = document.getElementById('return-date');
 
-        fetch('/borrow/', {
+        fetch('/library/app/borrow/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -474,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     logoutBtn.addEventListener("click", function () {
 
-        fetch("/logout/", {  
+        fetch("/library/app/logout/", {  
             method: "POST",
             headers: { "X-CSRFToken": csrftoken }, 
         })
@@ -489,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 opMsg.style.color = "green"; 
                 
                 setTimeout(() => {
-                    window.location.href = "/";  
+                    window.location.href = "/library/";  
                 }, 3000);  
             }
         })
