@@ -29,6 +29,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['www.danielgavrilescu.com', 'danielgavrilescu.com', '35.205.197.231']
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
