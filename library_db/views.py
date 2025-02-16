@@ -119,7 +119,7 @@ def library_view(request):
             cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                            "FROM transactions a "
                            "LEFT JOIN books b ON a.book_id=b.book_id "
-                           "WHERE a.trx_status <> 0 AND a.end_date = '9999-12-31' AND a.user_id = %s", [user_id])
+                           "WHERE a.trx_status <> 0 AND CAST(a.end_date AS DATE) = CAST('9999-12-31' AS DATE) AND a.user_id = %s", [user_id])
             books = cursor.fetchall()
 
     borrowed_books = []
