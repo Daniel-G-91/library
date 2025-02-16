@@ -263,6 +263,7 @@
         const change = 1;
         const retDate = document.getElementById('return-date');
         const buttonR = document.getElementById('return-btn');
+        const buttonE = document.getElementById('extend-btn');
 
         fetch('/library/app/return/', {
             method: 'POST',
@@ -285,6 +286,7 @@
                 authTitle.style.display = "none";
                 retDate.style.display = "none";
                 buttonR.disabled = true;
+                buttonE.disabled = true;
 
             } else {
                 opMsg.textContent = data.errors.join('\n'); 
