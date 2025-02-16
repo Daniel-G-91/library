@@ -1,10 +1,4 @@
-SELECT name, type_desc, create_date, modify_date
-FROM sys.triggers
-ORDER BY name;
-
-SELECT * FROM INFORMATION_SCHEMA.ROUTINES
-WHERE ROUTINE_TYPE = 'PROCEDURE';
-
+/* For migrations purposes
 
 create table temp_users ( 
 	
@@ -14,6 +8,7 @@ create table temp_users (
 );
 GO
 
+*/
 
 CREATE TABLE books (
 
@@ -23,7 +18,6 @@ CREATE TABLE books (
 	samples INT
 );
 GO
-
 
 CREATE TABLE users (
 
@@ -69,24 +63,42 @@ GO
 ALTER PROCEDURE create_user
 	@user_name NVARCHAR(50),
 	@user_email NVARCHAR(100),
-	@user_password NVARCHAR(128)
+	@user_password NVARCHAR(256)
 AS
-
 BEGIN
 
-	IF EXISTS (SELECT 1 FROM users WHERE user_email = @user_email AND end_date = '9999-12-31' AND user_status = 1)
-    BEGIN
-        RAISERROR('Email is already registered', 16, 1)
-        RETURN
-    END
+	SET NOCOUNT ON;
 
-	IF EXISTS (SELECT 1 FROM users WHERE user_name = @user_name AND end_date = '9999-12-31' AND user_status = 1)
-    BEGIN
-		RAISERROR('Username is already registered', 16, 1)
-        RETURN
-    END
+	DECLARE @user_id INT;
 
-	INSERT INTO users (user_id, user_name, user_email, user_password) VALUES (NEXT VALUE FOR UserId_Seq, @user_name, @user_email, @user_password);
+	BEGIN TRANSACTION;
+
+	BEGIN TRY
+
+		IF EXISTS (SELECT 1 FROM users WHERE user_email = @user_email AND end_date = '9999-12-31' AND user_status = 1)
+		BEGIN
+			THROW 50001, 'Email is already registered', 1;
+		END
+
+		IF EXISTS (SELECT 1 FROM users WHERE user_name = @user_name AND end_date = '9999-12-31' AND user_status = 1)
+		BEGIN
+			THROW 50002, 'Username is already registered', 1;
+		END
+
+		SET @user_id = NEXT VALUE FOR UserId_Seq;
+
+		INSERT INTO users (user_id, user_name, user_email, user_password) 
+		VALUES (@user_id, @user_name, @user_email, @user_password);
+
+		COMMIT TRANSACTION;
+
+	END TRY
+
+	BEGIN CATCH
+		ROLLBACK TRANSACTION;
+		THROW;
+	END CATCH;
+
 END;
 GO
 
@@ -235,25 +247,66 @@ AS
 
 BEGIN
 	
+	SET NOCOUNT ON;
+
 	DECLARE 
 		@v_borrow_date DATE,
 		@v_ext_count INT;
 
-	SELECT @v_borrow_date = borrow_date, @v_ext_count = ext_count
-	FROM transactions
-	WHERE
-		trx_status <> 0
-		AND user_id = @user_id
-		AND book_id = @book_id
-		AND end_date = '9999-12-31';
+	BEGIN TRY
+		BEGIN TRANSACTION;
 
-	INSERT INTO transactions (user_id, book_id, borrow_date, return_date, trx_status, ext_count, start_date, end_date)
-	VALUES (@user_id, @book_id, @v_borrow_date, GETDATE(), 0, @v_ext_count, GETDATE(), '9999-12-31');
+		SELECT @v_borrow_date = borrow_date, @v_ext_count = ext_count
+		FROM transactions
+		WHERE
+			trx_status <> 0
+			AND user_id = @user_id
+			AND book_id = @book_id
+			AND end_date = '9999-12-31';
 
-	UPDATE books
-	SET samples = samples + 1
-	WHERE
-		book_id = @book_id;
+		INSERT INTO transactions (user_id, book_id, borrow_date, return_date, trx_status, ext_count, start_date, end_date)
+		VALUES (@user_id, @book_id, @v_borrow_date, GETDATE(), 0, @v_ext_count, GETDATE(), '9999-12-31');
+
+		UPDATE books
+		SET samples = samples + 1
+		WHERE
+			book_id = @book_id;
+
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		ROLLBACK TRANSACTION;
+		DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+		RAISERROR(@ErrorMessage, 16, 1);
+	END CATCH
 
 END;
 GO
+
+-- Testing ---------------------------------------------------------------------------------------------------------------------------
+
+SELECT name, type_desc, create_date, modify_date
+FROM sys.triggers
+ORDER BY name;
+
+SELECT * FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_TYPE = 'PROCEDURE';
+
+
+
+SELECT * FROM users;
+SELECT * FROM transactions;
+SELECT * FROM books WHERE book_id = 46
+
+DELETE FROM transactions WHERE end_date = '9999-12-31'
+
+SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'transactions' 
+
+SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date
+FROM transactions a 
+                           LEFT JOIN books b ON a.book_id=b.book_id 
+                           WHERE a.trx_status <> 0 AND CAST(a.end_date AS DATE) = CAST('9999-12-31' AS DATE) AND a.user_id = 
+
+EXEC return_book @user_id = 1, @book_id = 64
