@@ -79,7 +79,7 @@ def log_in(request):
 
             # Retrieve user data from DB
             with connection.cursor() as cursor:
-                cursor.execute("SELECT user_id, user_password FROM Users WHERE user_name = %s", [user_name])
+                cursor.execute("SELECT user_id, user_password FROM Users WHERE end_date = '9999-12-31' AND user_name = %s", [user_name])
                 user = cursor.fetchone()  # Fetch single row
 
             if user is None:
@@ -92,7 +92,7 @@ def log_in(request):
             if not check_password(password, stored_hashed_password):
                 return JsonResponse({'success': False, 'errors': ["Invalid username or password."]}, status=400)
 
-            # Successful login → Redirect to library_2.html
+            # Successful login → Redirect to library.html
             request.session['user_id'] = user_id
             request.session['username'] = user_name
             
@@ -119,7 +119,7 @@ def library_view(request):
             cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                            "FROM transactions a "
                            "LEFT JOIN books b ON a.book_id=b.book_id "
-                           "WHERE a.trx_status <> 0 AND a.user_id = %s", [user_id])
+                           "WHERE a.trx_status <> 0 AND end_date = '9999-12-31' AND a.user_id = %s", [user_id])
             books = cursor.fetchall()
 
     borrowed_books = []
@@ -169,11 +169,10 @@ def extend_book(request):
             if not user_id or not book_id:
                 return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
             
-            # Execute stored procedure
             with connection.cursor() as cursor:
                 try:
                     cursor.execute("EXEC extend_borrow @user_id=%s, @book_id=%s", [user_id, book_id])
-                    cursor.execute("SELECT return_date FROM transactions WHERE trx_status <> 0 AND user_id=%s AND book_id=%s", [user_id, book_id])
+                    cursor.execute("SELECT return_date FROM transactions WHERE trx_status <> 0 AND end_date = '9999-12-31' AND user_id=%s AND book_id=%s", [user_id, book_id])
                     new_return_date = cursor.fetchone()[0]
 
                 except DatabaseError as e:
@@ -199,7 +198,6 @@ def return_book(request):
             if not user_id or not book_id:
                 return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
             
-            # Execute stored procedure
             with connection.cursor() as cursor:
                 try:
                     cursor.execute("EXEC return_book @user_id=%s, @book_id=%s", [user_id, book_id])
@@ -207,7 +205,7 @@ def return_book(request):
                     cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                                 "FROM transactions a "
                                 "LEFT JOIN books b ON a.book_id=b.book_id "
-                                "WHERE a.trx_status <> 0 AND a.user_id = %s", [user_id])
+                                "WHERE a.trx_status <> 0 AND a.end_date = '9999-12-31' AND a.user_id = %s", [user_id])
 
                     borrowed_books = [
                         {
@@ -250,7 +248,7 @@ def borrow_book(request):
                     cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                                 "FROM transactions a "
                                 "LEFT JOIN books b ON a.book_id=b.book_id "
-                                "WHERE a.trx_status <> 0 AND a.user_id = %s", [user_id])
+                                "WHERE a.trx_status <> 0 AND a.end_date = '9999-12-31' AND a.user_id = %s", [user_id])
 
                     borrowed_books = [
                         {
