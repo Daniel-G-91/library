@@ -68,7 +68,6 @@ def log_in(request):
             user_name = data.get('username', '').strip()
             password = data.get('password', '').strip()
 
-            # Validate input
             errors = []
             if not user_name:
                 errors.append("Username is required.")
@@ -77,7 +76,6 @@ def log_in(request):
             if errors:
                 return JsonResponse({'success': False, 'errors': errors}, status=400)
 
-            # Retrieve user data from DB
             with connection.cursor() as cursor:
                 cursor.execute("SELECT user_id, user_password FROM Users WHERE CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND user_name = %s", [user_name])
                 user = cursor.fetchone()  # Fetch single row
@@ -88,11 +86,9 @@ def log_in(request):
             user_id = user[0]
             stored_hashed_password = user[1]  # Extract password from query result
 
-            # Verify password
             if not check_password(password, stored_hashed_password):
                 return JsonResponse({'success': False, 'errors': ["Invalid username or password."]}, status=400)
 
-            # Successful login → Redirect to library.html
             request.session['user_id'] = user_id
             request.session['username'] = user_name
             
@@ -157,6 +153,55 @@ def library_view(request):
         'borrowed_books': borrowed_books,
         'stock': stock
     })
+
+def borrow_book(request):
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            book_id = data.get('book_id')
+            user_id = request.session.get('user_id')
+    
+            if not user_id or not book_id:
+                return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+            
+            with connection.cursor() as cursor:
+                try:
+                    cursor.execute("EXEC borrow_book @user_id=%s, @book_id=%s", [user_id, book_id])
+
+                    cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
+                                "FROM transactions a "
+                                "LEFT JOIN books b ON a.book_id=b.book_id "
+                                "WHERE a.trx_status <> 0 AND CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND a.user_id = %s", [user_id])
+
+                    borrowed_books = [
+                        {
+                            'book_id': row[0],
+                            'book_img': re.sub(r'[^a-zA-Z0-9]', '', row[1]).lower(),
+                            'book_title': row[1],
+                            'book_author': row[2],
+                            'borrow_date': row[3],
+                            'return_date': row[4]
+                        }
+                        for row in cursor.fetchall()
+                    ]
+
+                except DatabaseError as e:
+                    error_message = str(e)
+                    
+                    if "multiple times" in error_message:
+                        return JsonResponse({'success': False, 'errors': ["You can't borrow the same book multiple times."]}, status=400)
+                    elif "not available" in error_message:
+                        return JsonResponse({'success': False, 'errors': ["This book is not available in stock right now."]}, status=400)
+                    elif "3 books" in error_message:
+                        return JsonResponse({'success': False, 'errors': ["You can't borrow more than 3 books."]}, status=400)
+                    else:
+                        return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
+                                    
+                return JsonResponse({'success': True, 'message': "You borrowed a new book. Enjoy reading!", 'borrowed_books':borrowed_books, 'book_id':book_id})
+        except:
+            return JsonResponse({'success': False, 'message': 'Return Error'}, status=400)
+
 
 def extend_book(request):
     
@@ -225,56 +270,6 @@ def return_book(request):
                     return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
                 
                 return JsonResponse({'success': True, 'message': "The book was returned.", 'borrowed_books':borrowed_books, 'book_id':book_id})
-        except:
-            return JsonResponse({'success': False, 'message': 'Return Error'}, status=400)
-
-
-def borrow_book(request):
-    
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            book_id = data.get('book_id')
-            user_id = request.session.get('user_id')
-    
-            if not user_id or not book_id:
-                return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
-            
-            # Execute stored procedure
-            with connection.cursor() as cursor:
-                try:
-                    cursor.execute("EXEC borrow_book @user_id=%s, @book_id=%s", [user_id, book_id])
-
-                    cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
-                                "FROM transactions a "
-                                "LEFT JOIN books b ON a.book_id=b.book_id "
-                                "WHERE a.trx_status <> 0 AND CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND a.user_id = %s", [user_id])
-
-                    borrowed_books = [
-                        {
-                            'book_id': row[0],
-                            'book_img': re.sub(r'[^a-zA-Z0-9]', '', row[1]).lower(),
-                            'book_title': row[1],
-                            'book_author': row[2],
-                            'borrow_date': row[3],
-                            'return_date': row[4]
-                        }
-                        for row in cursor.fetchall()
-                    ]
-
-                except DatabaseError as e:
-                    error_message = str(e)
-                    
-                    if "multiple times" in error_message:
-                        return JsonResponse({'success': False, 'errors': ["You can't borrow the same book multiple times."]}, status=400)
-                    elif "not available" in error_message:
-                        return JsonResponse({'success': False, 'errors': ["This book is not available in stock right now."]}, status=400)
-                    elif "3 books" in error_message:
-                        return JsonResponse({'success': False, 'errors': ["You can't borrow more than 3 books."]}, status=400)
-                    else:
-                        return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
-                                    
-                return JsonResponse({'success': True, 'message': "You borrowed a new book. Enjoy reading!", 'borrowed_books':borrowed_books, 'book_id':book_id})
         except:
             return JsonResponse({'success': False, 'message': 'Return Error'}, status=400)
 
