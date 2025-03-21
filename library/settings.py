@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-%zlg9f1@wp#bx_yb5z-m!ueqe#k)3-uvg-c0(oosfbcg#-utc7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['www.danielgavrilescu.com', 'danielgavrilescu.com', '35.205.197.231']
+ALLOWED_HOSTS = ['www.danielgavrilescu.com', 'danielgavrilescu.com', '34.51.141.220']
 
 
 
@@ -81,10 +81,10 @@ WSGI_APPLICATION = "library.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'library_db',  # Replace with your actual database name
-        'USER': 'sqlserver',  # Leave empty for Windows Authentication
-        'PASSWORD': 'daniel123',  # Leave empty for Windows Authentication
-        'HOST': '34.22.184.124',  # Your server name from the SSMS window
+        'NAME': 'library-app',  # Replace with your actual database name
+        'USER': 'daniel',  # Leave empty for Windows Authentication
+        'PASSWORD': 'daniel123!',  # Leave empty for Windows Authentication
+        'HOST': '34.51.147.180',  # Your server name from the SSMS window
         'PORT': '1433',  # Leave empty for default port (1433)
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
