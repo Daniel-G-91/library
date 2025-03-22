@@ -249,8 +249,13 @@
                 password: password
             }),
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log("Response status:", response.status);
+            response.json();
+        })
+
         .then(data => {
+            console.log("Response data:", data);
             if (!data.success) {
                 data.errors.forEach(error => {
                     if (error.includes("Username is required")) {
@@ -263,7 +268,11 @@
                     }
                 });
             } else {
-                window.location.replace = data.redirect_url;  // Redirect on success
+                console.log("Redirecting to:", data.redirect_url); // Debug log
+        // Try a more direct approach
+        setTimeout(function() {
+            window.location.href = data.redirect_url;
+        }, 100);
             }
         })
         .catch(error => {
