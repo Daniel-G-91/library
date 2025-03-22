@@ -251,12 +251,33 @@
         })
         .then(response => {
             console.log("Response status:", response.status);
-            response.json();
+            console.log("Response headers:", response.headers);
+            
+            // Check response content type
+            console.log("Content-Type:", response.headers.get('Content-Type'));
+            
+            // First try to read the raw text
+            return response.text().then(text => {
+                console.log("Raw response:", text);
+                
+                // Only try to parse as JSON if it's not empty
+                if (text) {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error("JSON parse error:", e);
+                        throw new Error("Invalid JSON response");
+                    }
+                }
+                return null;
+            });
         })
-
         .then(data => {
-            console.log("Response data:", data);
-            if (!data.success) {
+            console.log("Parsed data:", data);
+            if (data && data.success) {
+                console.log("Redirecting to:", data.redirect_url);
+                window.location.href = data.redirect_url;
+            } else if (data && data.errors) {
                 data.errors.forEach(error => {
                     if (error.includes("Username is required")) {
                         usernameError.innerText = error;
@@ -268,15 +289,11 @@
                     }
                 });
             } else {
-                console.log("Redirecting to:", data.redirect_url); // Debug log
-        // Try a more direct approach
-        setTimeout(function() {
-            window.location.href = data.redirect_url;
-        }, 100);
+                console.error("Invalid response format");
             }
         })
         .catch(error => {
-            console.error("Error:", error);
+            console.error("Fetch error:", error);
         });
     });
     </script>
