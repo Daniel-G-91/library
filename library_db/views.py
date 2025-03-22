@@ -6,9 +6,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.db import connection, IntegrityError, DatabaseError
 #from django.core.exceptions import ValidationError
 import json, re, random
-from django.urls import reverse
-
-
 
 def home_view(request):
     return render(request, 'library.html')
@@ -94,9 +91,7 @@ def log_in(request):
             request.session['user_id'] = user_id
             request.session['username'] = user_name
 
-            redirect_url = reverse('library')
-            
-            return JsonResponse({'success': True, 'redirect_url': redirect_url})
+            return JsonResponse({'success': True, 'redirect_url': '/library/app/'})
 
         except Exception as e:
             return JsonResponse({'success': False, 'errors': ["Something went wrong."]}, status=500)
