@@ -49,7 +49,7 @@ def sign_up(request):
                     if "Username is already registered" in error_message:
                         return JsonResponse({'success': False, 'errors': ["Username is already registered."]}, status=400)
 
-            return JsonResponse({'success': True, 'message': 'User created successfully'})
+            return JsonResponse({'success': True, 'message': 'User created successfully'}, content_type='application/json')
 
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'errors': ["Invalid JSON format."]}, status=400)
@@ -197,7 +197,7 @@ def borrow_book(request):
                     else:
                         return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
                                     
-                return JsonResponse({'success': True, 'message': "You borrowed a new book. Enjoy reading!", 'borrowed_books':borrowed_books, 'book_id':book_id})
+                return JsonResponse({'success': True, 'message': "You borrowed a new book. Enjoy reading!", 'borrowed_books':borrowed_books, 'book_id':book_id}, content_type='application/json')
         except:
             return JsonResponse({'success': False, 'message': 'Return Error'}, status=400)
 
@@ -227,7 +227,7 @@ def extend_book(request):
                 
                     return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
                 
-                return JsonResponse({'success': True, 'message': "You've extended the period by 7 more days.", 'new_return_date': new_return_date})
+                return JsonResponse({'success': True, 'message': "You've extended the period by 7 more days.", 'new_return_date': new_return_date}, content_type='application/json')
         except:
             return JsonResponse({'success': False, 'message': 'Extend Error'}, status=400)
 
@@ -268,7 +268,7 @@ def return_book(request):
                     
                     return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
                 
-                return JsonResponse({'success': True, 'message': "The book was returned.", 'borrowed_books':borrowed_books, 'book_id':book_id})
+                return JsonResponse({'success': True, 'message': "The book was returned.", 'borrowed_books':borrowed_books, 'book_id':book_id}, content_type='application/json')
         except:
             return JsonResponse({'success': False, 'message': 'Return Error'}, status=400)
 
