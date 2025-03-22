@@ -91,7 +91,8 @@ def log_in(request):
             request.session['user_id'] = user_id
             request.session['username'] = user_name
 
-            return JsonResponse({'success': True, 'redirect_url': '/library/app/'})
+            redirect_url = request.build_absolute_uri('/library/app/')
+            return JsonResponse({'success': True, 'redirect_url': redirect_url})
 
         except Exception as e:
             return JsonResponse({'success': False, 'errors': ["Something went wrong."]}, status=500)

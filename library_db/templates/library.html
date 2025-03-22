@@ -263,7 +263,7 @@
                     }
                 });
             } else {
-                window.location.href = data.redirect_url;  // Redirect on success
+                window.location.replace = data.redirect_url;  // Redirect on success
             }
         })
         .catch(error => {
