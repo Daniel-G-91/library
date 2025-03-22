@@ -164,7 +164,7 @@
 
             var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
 
-            fetch('/signup/', {
+            fetch('/library/signup/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -238,7 +238,7 @@
     
         var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
     
-        fetch('/login/', {
+        fetch('/library/login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
