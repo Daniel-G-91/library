@@ -255,7 +255,10 @@
         })
 
         .then(data => {
-            if (!data.success) {
+    
+            if (data && data.success) {
+                window.location.href = data.redirect_url;
+            } else if (data && data.errors) {
                 data.errors.forEach(error => {
                     if (error.includes("Username is required")) {
                         usernameError.innerText = error;
@@ -267,10 +270,8 @@
                     }
                 });
             } else {
-                setTimeout(function() {
-                    window.location.href = data.redirect_url;
-                }, 100);
-          }
+                console.error("Invalid response format");
+            }
         })
         .catch(error => {
             console.error("Error:", error);
