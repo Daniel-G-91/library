@@ -6,7 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LibraryDB</title>
-    <link rel="stylesheet" href="{% static 'library.css' %}">
+    <link rel="stylesheet" href="{% static 'library.css' %}?v={{ STATIC_VERSION }}">
+    <link rel="icon" href="{% static 'images/library.png' %}">
 </head>
 <body>
     <!-- Landing page -->
