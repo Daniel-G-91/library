@@ -23,10 +23,10 @@ urlpatterns = [
     path('library/', home_view, name='home'),
     path('library/signup/', sign_up, name="sign-up"),
     path('library/login/', log_in, name="login"),
-    path('library/app/', library_view, name='library'),
-    path('library/app/borrow/', borrow_book, name="borrow"),
-    path('library/app/extend/', extend_book, name="extend"),
-    path('library/app/return/', return_book, name="return"),
-    path('library/app/logout/', log_out, name="logout")
+    path('app/', library_view, name='library'),
+    path('app/borrow/', borrow_book, name="borrow"),
+    path('app/extend/', extend_book, name="extend"),
+    path('app/return/', return_book, name="return"),
+    path('app/logout/', log_out, name="logout")
 
 ]
