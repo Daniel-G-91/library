@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LibraryDB</title>
     <link rel="stylesheet" href="{% static 'library.css' %}">
-    <link rel="icon" href="{% static 'images/favicon.avif' %}">
 </head>
 <body>
     <!-- Landing page -->
@@ -165,7 +164,7 @@
 
             var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
 
-            fetch('/library/signup/', {
+            fetch('/signup/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -186,7 +185,7 @@
                     successMessage.style.color = "green";
 
                     setTimeout(() => {
-                        window.location.href = '/library/';
+                        window.location.href = '/';
                     }, 3000);
                 } else {
                     data.errors.forEach(error => {
@@ -239,7 +238,7 @@
     
         var csrftoken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
     
-        fetch('/library/login/', {
+        fetch('/login/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
