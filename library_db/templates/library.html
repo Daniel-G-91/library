@@ -249,9 +249,18 @@
                 password: password
             }),
         })
-        .then(response => {
-            // console.log("Response status:", response.status);
-            response.json();
+    .then(response => {
+        return response.text().then(text => {
+            if (text) {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error("JSON parse error:", e);
+                    throw new Error("Invalid JSON response");
+                }
+        }
+        return null;
+        });
         })
 
         .then(data => {
