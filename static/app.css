@@ -267,7 +267,7 @@ button:active {
     .user-panel {
         text-align: center; /* Center-align text */
         padding: 15px; /* Reduce padding for smaller screens */
-        height: 355px;
+        height: 400px;
     }
 
     /* User Shelf */
