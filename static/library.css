@@ -66,15 +66,15 @@ a:hover {
 }
 .buttons {
     display: flex;
-}
-
-button {
-    display: flex;
     justify-content: space-between;
     margin-top: 20px;
     margin-bottom: 7px;
     margin-left: 5px;
     margin-right: 5px;
+}
+
+button {
+    display: flex;
     padding: 10px 20px;
     background: #D4D0C8;
     border: 2px solid #808080;
