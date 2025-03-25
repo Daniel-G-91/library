@@ -17,7 +17,7 @@
 
             <!-- Log in -->
             <div class="login-form" id="login-form">
-                <h2>Login</h2>
+                <div class="title-bar"><h2>Login</h2></div>
                 <form method="POST" id="login-form">
                     {% csrf_token %}
                     <label for="username">Username</label>
@@ -40,7 +40,7 @@
             <!-- Sign up -->
 
             <div class="signup-form" id="signup-form" style="display: none;">
-                <h2>Sign Up</h2>
+                <div class="title-bar"><h2>Sign Up</h2></div>
                 <form method="POST" id="signup-form">
                     {% csrf_token %}
                     <label for="email">Email</label>
