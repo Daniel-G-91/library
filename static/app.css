@@ -33,7 +33,6 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     min-width: 65%;
     max-height: 45%;
     border-bottom: 2px solid hsl(0, 0%, 30%);;
