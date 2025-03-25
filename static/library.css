@@ -43,7 +43,7 @@ label {
 }
 
 input {
-    max-width: 95%;
+    width: 95vh;
     padding: 8px;
     margin: 5px;
     border: 2px solid hsl(0, 0%, 50%);
@@ -64,7 +64,7 @@ a:hover {
     text-decoration: underline;
 }
 
-.buttons {
+button {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;

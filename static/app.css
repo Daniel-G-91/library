@@ -36,6 +36,8 @@ body {
     min-width: 65%;
     max-height: 45%;
     border-bottom: 2px solid hsl(0, 0%, 30%);;
+    margin-top: 0;
+    box-sizing: border-box;
 }
 
 .title-bar {
@@ -48,8 +50,9 @@ body {
     align-items: center;
     font-size: 14px;
     height: 25px;
-    margin-top: 0px;
+    margin-top: 0;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .op-msg {
