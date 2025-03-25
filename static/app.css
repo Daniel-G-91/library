@@ -260,7 +260,6 @@ button:active {
     /* Container */
     .container {
         width: 95%; /* Reduce container width for smaller screens */
-        margin: 0 auto; /* Center the container */
         padding: 10px; /* Add padding for better spacing */
     }
 
@@ -268,7 +267,7 @@ button:active {
     .user-panel {
         text-align: center; /* Center-align text */
         padding: 15px; /* Reduce padding for smaller screens */
-        height: 300px;
+        height: 355px;
     }
 
     /* User Shelf */
