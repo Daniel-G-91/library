@@ -43,7 +43,8 @@ label {
 }
 
 input {
-    width: 95vh;
+    box-sizing: border-box;
+    width: 95%;
     padding: 8px;
     margin: 5px;
     border: 2px solid hsl(0, 0%, 50%);
@@ -62,6 +63,9 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+.buttons {
+    display: flex;
 }
 
 button {
