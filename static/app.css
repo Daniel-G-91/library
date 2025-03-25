@@ -257,36 +257,80 @@ button:active {
 
 /* 📱 Mobile & Small Screens */
 @media (max-width: 768px) {
+    /* Container */
     .container {
-        width: 95%;
+        width: 95%; /* Reduce container width for smaller screens */
+        margin: 0 auto; /* Center the container */
+        padding: 10px; /* Add padding for better spacing */
     }
-    
+
+    /* User Panel */
     .user-panel {
-        text-align: center;
+        text-align: center; /* Center-align text */
+        padding: 15px; /* Reduce padding for smaller screens */
     }
 
+    /* User Shelf */
     .user-shelf {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center-align items */
+        gap: 15px; /* Add spacing between items */
     }
 
+    .shelf-books {
+        min-width: 100%; /* Make shelf books take up full width */
+        min-height: 200px; /* Set a minimum height for shelf books */
+        margin-left: 0; /* Remove left margin */
+    }
+
+    /* Shelf Books and Book List */
     .shelf-books, .book-list {
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Adjust grid for smaller screens */
+        gap: 8px; /* Reduce gap between items */
+        padding: 10px; /* Add padding for spacing */
     }
 
+    /* Book Items */
     .book-item, .stock-item {
-        max-width: 100px;
+        max-width: 80px; /* Reduce item size */
+        height: auto; /* Adjust height for smaller screens */
     }
-    
+
+    /* Book Actions */
     .book-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 5px;
+        display: flex; /* Display buttons in a row */
+        justify-content: center; /* Center-align buttons */
+        gap: 8px; /* Add spacing between buttons */
     }
 
     .book-actions button {
-        width: 45%;
+        width: 45%; /* Make buttons take up 45% of the width */
+        height: 40px; /* Adjust button height */
+        font-size: 12px; /* Reduce font size */
+    }
+
+    /* Search Bar */
+    #search-bar {
+        width: 90%; /* Make the search bar take up most of the width */
+        margin: 10px auto; /* Center the search bar */
+    }
+
+    /* Book Details */
+    .book-details {
+        margin: 0 auto; /* Center-align book details */
+        padding: 10px; /* Add padding for spacing */
+        width: 90%; /* Reduce width for smaller screens */
+    }
+
+    .book-details p {
+        font-size: 12px; /* Reduce font size for smaller screens */
+    }
+
+    /* Logout Button */
+    #logout-btn {
+        width: 90%; /* Make the logout button take up most of the width */
+        margin: 10px auto; /* Center the button */
+        padding: 10px; /* Adjust padding */
     }
 }
 
