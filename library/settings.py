@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'libraryapp',  # Replace with your actual database name
         'USER': 'sqlserver',  # Leave empty for Windows Authentication
         'PASSWORD': 'Library123!',  # Leave empty for Windows Authentication
-        'HOST': '35.228.103.206',  # Your server name from the SSMS window
+        'HOST': '34.51.186.6',  # Your server name from the SSMS window
         'PORT': '1433',  # Leave empty for default port (1433)
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
