@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-%zlg9f1@wp#bx_yb5z-m!ueqe#k)3-uvg-c0(oosfbcg#-utc7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['www.danielgavrilescu.com', 'danielgavrilescu.com', '34.51.141.220']
+ALLOWED_HOSTS = ['www.danielgavrilescu.com', 'danielgavrilescu.com', '35.228.103.206']
 
 
 
