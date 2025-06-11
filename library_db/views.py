@@ -76,7 +76,7 @@ def log_in(request):
                 return JsonResponse({'success': False, 'errors': errors}, status=400)
 
             with connection.cursor() as cursor:
-                cursor.execute("SELECT user_id, user_password FROM Users WHERE CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND user_name = %s", [user_name])
+                cursor.execute("SELECT user_id, user_password FROM Users WHERE end_date = '9999-12-31' AND user_status = 1 AND user_name = %s", [user_name])
                 user = cursor.fetchone()  # Fetch single row
 
             if user is None:
@@ -114,7 +114,7 @@ def library_view(request):
             cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                            "FROM transactions a "
                            "LEFT JOIN books b ON a.book_id=b.book_id "
-                           "WHERE a.trx_status <> 0 AND CAST(a.end_date AS DATE) = CAST('9999-12-31' AS DATE) AND a.user_id = %s", [user_id])
+                           "WHERE a.trx_status <> 0 AND a.end_date = '9999-12-31' AND a.user_id = %s", [user_id])
             books = cursor.fetchall()
 
     borrowed_books = []
@@ -171,7 +171,7 @@ def borrow_book(request):
                     cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                                 "FROM transactions a "
                                 "LEFT JOIN books b ON a.book_id=b.book_id "
-                                "WHERE a.trx_status <> 0 AND CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND a.user_id = %s", [user_id])
+                                "WHERE a.trx_status <> 0 AND end_date = '9999-12-31' AND a.user_id = %s", [user_id])
 
                     borrowed_books = [
                         {
@@ -216,7 +216,7 @@ def extend_book(request):
             with connection.cursor() as cursor:
                 try:
                     cursor.execute("EXEC extend_borrow @user_id=%s, @book_id=%s", [user_id, book_id])
-                    cursor.execute("SELECT return_date FROM transactions WHERE trx_status <> 0 AND CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND user_id=%s AND book_id=%s", [user_id, book_id])
+                    cursor.execute("SELECT return_date FROM transactions WHERE trx_status <> 0 AND end_date = '9999-12-31' AND user_id=%s AND book_id=%s", [user_id, book_id])
                     new_return_date = cursor.fetchone()[0]
 
                 except DatabaseError as e:
@@ -224,8 +224,10 @@ def extend_book(request):
                     
                     if "You can't extend more than 3 times." in error_message:
                         return JsonResponse({'success': False, 'errors': ["You can't extend more than 3 times."]}, status=400)
-                
-                    return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
+                    elif "exceeded the maximum" in error_message:
+                        return JsonResponse({'success': False, 'errors': ["You've exceeded the maximum borrowing period."]}, status=400)
+                    else:
+                        return JsonResponse({'success': False, 'errors': [error_message]}, status=400)
                 
                 return JsonResponse({'success': True, 'message': "You've extended the period by 7 more days.", 'new_return_date': new_return_date}, content_type='application/json')
         except:
@@ -249,7 +251,7 @@ def return_book(request):
                     cursor.execute("SELECT a.book_id, b.book_title, b.book_author, a.borrow_date, a.return_date "
                                 "FROM transactions a "
                                 "LEFT JOIN books b ON a.book_id=b.book_id "
-                                "WHERE a.trx_status <> 0 AND CAST(end_date as DATE) = CAST('9999-12-31' as DATE) AND a.user_id = %s", [user_id])
+                                "WHERE a.trx_status <> 0 AND end_date = '9999-12-31' AND a.user_id = %s", [user_id])
 
                     borrowed_books = [
                         {
