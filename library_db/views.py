@@ -6,6 +6,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.db import connection, IntegrityError, DatabaseError
 #from django.core.exceptions import ValidationError
 import json, re, random
+import logging
+
+logger = logging.getLogger(__name__)
 
 def home_view(request):
     return render(request, 'library.html')
@@ -94,7 +97,8 @@ def log_in(request):
             return JsonResponse({'success': True, 'redirect_url': '/library/app/'}, content_type='application/json')
 
         except Exception as e:
-            return JsonResponse({'success': False, 'errors': ["Something went wrong."]}, status=500)
+            logger.error(f"Login error: {str(e)}")
+            return JsonResponse({'success': False, 'errors': ["str(e)"]}, status=500)
 
     return JsonResponse({'success': False, 'errors': ['Invalid request']}, status=400)
 
