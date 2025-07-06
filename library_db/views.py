@@ -99,7 +99,9 @@ def log_in(request):
 
         except Exception as e:
             logger.error(f"Login error: {str(e)}")
+            print("Login error:", str(e))
             logger.error('Traceback:\n%s', traceback.format_exc())
+            print("Traceback:\n", traceback.format_exc())
             return JsonResponse({'success': False, 'errors': [str(e)]}, status=500)
 
     return JsonResponse({'success': False, 'errors': ['Invalid request']}, status=400)
