@@ -99,7 +99,7 @@ def log_in(request):
 
             print("User logged in successfully:", user_name)
 
-            return JsonResponse({'success': True, 'redirect_url': '/library/app/'}, content_type='application/json')
+            return JsonResponse({'success': True, 'redirect_url': '/library/app/'})
 
         except Exception as e:
             logger.error(f"Login error: {str(e)}")
