@@ -84,7 +84,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': 'libraryapp',  # Replace with your actual database name
         'USER': 'sqlserver',  # Leave empty for Windows Authentication
-        'PASSWORD': 'Library123!',  # Leave empty for Windows Authentication
+        'PASSWORD': 'daniel123!',  # Leave empty for Windows Authentication
         'HOST': '34.51.186.6',  # Your server name from the SSMS window
         'PORT': '1433',  # Leave empty for default port (1433)
         'OPTIONS': {
