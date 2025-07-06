@@ -97,6 +97,8 @@ def log_in(request):
             request.session['user_id'] = user_id
             request.session['username'] = user_name
 
+            print("User logged in successfully:", user_name)
+
             return JsonResponse({'success': True, 'redirect_url': '/library/app/'}, content_type='application/json')
 
         except Exception as e:
@@ -109,11 +111,11 @@ def log_in(request):
                 f.write("Traceback:\n" + traceback.format_exc() + "\n\n")
 
             return JsonResponse({'success': False, 'errors': [str(e)]}, status=500)
+        
+    print("Reached the end of log_in function without processing POST request")
 
     return JsonResponse({'success': False, 'errors': ['Invalid request']}, status=400)
 
-
-#@login_required
 def library_view(request):
     
     user_id = request.session.get('user_id')
