@@ -65,6 +65,8 @@ def sign_up(request):
 
 def log_in(request):
 
+    print("Login request received")
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
