@@ -7,6 +7,7 @@ from django.db import connection, IntegrityError, DatabaseError
 #from django.core.exceptions import ValidationError
 import json, re, random
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +99,7 @@ def log_in(request):
 
         except Exception as e:
             logger.error(f"Login error: {str(e)}")
+            logger.error('Traceback:\n%s', traceback.format_exc())
             return JsonResponse({'success': False, 'errors': ["str(e)"]}, status=500)
 
     return JsonResponse({'success': False, 'errors': ['Invalid request']}, status=400)
