@@ -102,6 +102,10 @@ def log_in(request):
             print("Login error:", str(e))
             logger.error('Traceback:\n%s', traceback.format_exc())
             print("Traceback:\n", traceback.format_exc())
+            with open('/tmp/login-error.log', 'a') as f:
+                f.write("Login error: " + str(e) + "\n")
+                f.write("Traceback:\n" + traceback.format_exc() + "\n\n")
+
             return JsonResponse({'success': False, 'errors': [str(e)]}, status=500)
 
     return JsonResponse({'success': False, 'errors': ['Invalid request']}, status=400)
